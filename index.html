@@ -168,6 +168,133 @@
   .tag.reformer { background: #1a3a2a; color: #6fcf97; }
   .tag.site { background: #2a2a3a; color: #a0a0f0; }
   .tag.currency { background: #3a2a1a; color: #f0c060; }
+  .tag.flight { background: #1a2a3a; color: #7ab8f5; }
+
+  /* Flight card styles */
+  .day-badge.flight { background: #2a4a6a; border: 1px solid #7ab8f5; }
+
+  .flight-segment {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    font-size: 0.8rem;
+  }
+
+  .flight-segment + .flight-segment {
+    border-top: 1px dashed #2a2a4a;
+  }
+
+  .flight-route {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .flight-code {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.85rem;
+  }
+
+  .flight-arrow {
+    color: #7ab8f5;
+    font-size: 0.7rem;
+  }
+
+  .flight-time {
+    color: #a0a0c0;
+    font-size: 0.75rem;
+  }
+
+  .flight-airline {
+    font-size: 0.7rem;
+    color: #7a7a9a;
+  }
+
+  .flight-detail-segment {
+    background: #1a2744;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+
+  .flight-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .flight-detail-airline {
+    font-weight: 600;
+    color: #7ab8f5;
+    font-size: 0.85rem;
+  }
+
+  .flight-detail-number {
+    color: #a0a0c0;
+    font-size: 0.8rem;
+  }
+
+  .flight-detail-route {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .flight-detail-airport {
+    flex: 1;
+  }
+
+  .flight-detail-airport .airport-code {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .flight-detail-airport .airport-name {
+    font-size: 0.7rem;
+    color: #7a7a9a;
+    margin-top: 2px;
+  }
+
+  .flight-detail-airport .airport-time {
+    font-size: 0.85rem;
+    color: #c0c0e0;
+    margin-top: 4px;
+  }
+
+  .flight-detail-arrow {
+    color: #7ab8f5;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .flight-detail-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.75rem;
+    color: #7a7a9a;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #2a2a4a;
+  }
+
+  .flight-detail-meta span { display: inline-flex; align-items: center; gap: 4px; }
+
+  .baggage-info {
+    background: #1a2744;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: #c0c0e0;
+    line-height: 1.6;
+  }
+
+  .baggage-info strong { color: #f0c060; }
 
   #map {
     flex: 1;
@@ -622,6 +749,33 @@
 <script>
 const stops = [
   {
+    id: 'flight-out',
+    city: 'Departure Flights',
+    country: 'SFO → ZRH → PRG',
+    days: 'Day 0-1',
+    dates: 'Mar 15-16',
+    lat: null, lng: null,
+    type: 'flight',
+    currency: '',
+    reformer: '',
+    image: '',
+    imageCaption: '',
+    summary: 'SFO → Zurich → Prague. Depart Mar 15 8:25 PM, arrive Prague Mar 16 7:00 PM.',
+    history: '',
+    flights: [
+      { airline: 'Swiss International Airlines', number: 'LX 0039', from: 'SFO', fromName: 'San Francisco Int\'l Airport', to: 'ZRH', toName: 'Zurich Airport', depart: 'Sun, Mar 15 — 8:25 PM', arrive: 'Mon, Mar 16 — 3:30 PM', duration: '11h 05m', terminal_from: 'Terminal I', terminal_to: '', cabin: 'Economy' },
+      { airline: 'Swiss International Airlines', number: 'LX 1488', from: 'ZRH', fromName: 'Zurich Airport', to: 'PRG', toName: 'Prague Ruzyne Airport', depart: 'Mon, Mar 16 — 5:40 PM', arrive: 'Mon, Mar 16 — 7:00 PM', duration: '1h 20m', terminal_from: '', terminal_to: 'Terminal 2', cabin: 'Economy' }
+    ],
+    baggage: { carryon: '1 piece (up to 8 kg / 118 cm)', checked1: '$75 USD (up to 23 kg / 158 cm)', checked2: '$110 USD (up to 23 kg / 158 cm)' },
+    sites: [],
+    tips: [
+      '2h 10m layover in Zurich — enough time but don\'t linger.',
+      'No checked bags included — carry-on only (1 piece, 8 kg).',
+      'Checked bag: $75 for first, $110 for second.',
+      'Arrive Prague 7:00 PM local time (11:00 AM PDT).'
+    ]
+  },
+  {
     id: 'prague',
     city: 'Prague',
     country: 'Czech Republic',
@@ -968,6 +1122,33 @@ const stops = [
       'Watch for pickpockets in Naples.',
       'Beautiful Amalfi coast views near Sorrento.'
     ]
+  },
+  {
+    id: 'flight-return',
+    city: 'Return Flights',
+    country: 'FCO → MUC → SFO',
+    days: 'Day 12',
+    dates: 'Mar 27',
+    lat: null, lng: null,
+    type: 'flight',
+    currency: '',
+    reformer: '',
+    image: '',
+    imageCaption: '',
+    summary: 'Rome → Munich → SFO. Depart Mar 27 12:25 PM, arrive SFO Mar 27 8:35 PM.',
+    history: '',
+    flights: [
+      { airline: 'Lufthansa', number: 'LH 1867', from: 'FCO', fromName: 'Rome Fiumicino Airport', to: 'MUC', toName: 'Munich Franz Josef Strauss Airport', depart: 'Fri, Mar 27 — 12:25 PM', arrive: 'Fri, Mar 27 — 2:00 PM', duration: '1h 35m', terminal_from: 'Terminal 1', terminal_to: 'Terminal 2', cabin: 'Economy' },
+      { airline: 'Lufthansa', number: 'LH 0458', from: 'MUC', fromName: 'Munich Franz Josef Strauss Airport', to: 'SFO', toName: 'San Francisco Int\'l Airport', depart: 'Fri, Mar 27 — 4:30 PM', arrive: 'Fri, Mar 27 — 8:35 PM', duration: '12h 05m', terminal_from: 'Terminal 2', terminal_to: 'Terminal I', cabin: 'Economy' }
+    ],
+    baggage: { carryon: '1 piece (up to 8 kg / 118 cm)', checked1: '$75 USD (up to 23 kg / 158 cm)', checked2: '$110 USD (up to 23 kg / 158 cm)' },
+    sites: [],
+    tips: [
+      '2h 30m layover in Munich — comfortable connection.',
+      'No checked bags included — carry-on only (1 piece, 8 kg).',
+      'Checked bag: $75 for first, $110 for second.',
+      'Arrive SFO 8:35 PM same day (crosses time zones).'
+    ]
   }
 ];
 
@@ -983,8 +1164,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   maxZoom: 19
 }).addTo(map);
 
-// Draw route line
-const routeCoords = stops.map(s => [s.lat, s.lng]);
+// Draw route line (skip flight entries with no coordinates)
+const routeCoords = stops.filter(s => s.lat !== null).map(s => [s.lat, s.lng]);
 L.polyline(routeCoords, {
   color: '#e94560',
   weight: 2,
@@ -1004,16 +1185,20 @@ const markerColors = {
   protestant: '#e94560',
   swiss: '#6fcf97',
   catholic: '#f0c060',
-  transit: '#7a7aaa'
+  transit: '#7a7aaa',
+  flight: '#7ab8f5'
 };
 
-// Add markers
+// Add markers (skip flight entries)
 const markers = {};
+let markerIndex = 0;
 stops.forEach((stop, i) => {
+  if (stop.lat === null) return; // skip flights
+  markerIndex++;
   const color = markerColors[stop.type];
   const icon = L.divIcon({
     className: 'custom-marker',
-    html: `<div class="marker-pin ${stop.type}"><span class="marker-day">${i+1}</span></div>`,
+    html: `<div class="marker-pin ${stop.type}"><span class="marker-day">${markerIndex}</span></div>`,
     iconSize: [28, 36],
     iconAnchor: [14, 36],
     popupAnchor: [0, -36]
@@ -1035,6 +1220,24 @@ stops.forEach((stop, i) => {
 
 // Korean translations
 const ko = {
+  'flight-out': {
+    summary: 'SFO → 취리히 → 프라하. 3/15 오후 8:25 출발, 프라하 3/16 오후 7:00 도착.',
+    tips: [
+      '취리히에서 2시간 10분 환승 — 충분하지만 여유 부리지 말 것.',
+      '위탁 수하물 불포함 — 기내 수하물만 (1개, 8kg).',
+      '위탁 수하물: 첫 번째 $75, 두 번째 $110.',
+      '프라하 현지 시간 오후 7:00 도착 (PDT 오전 11:00).'
+    ]
+  },
+  'flight-return': {
+    summary: '로마 → 뮌헨 → SFO. 3/27 오후 12:25 출발, SFO 3/27 오후 8:35 도착.',
+    tips: [
+      '뮌헨에서 2시간 30분 환승 — 여유 있는 연결.',
+      '위탁 수하물 불포함 — 기내 수하물만 (1개, 8kg).',
+      '위탁 수하물: 첫 번째 $75, 두 번째 $110.',
+      'SFO 같은 날 오후 8:35 도착 (시간대 횡단).'
+    ]
+  },
   prague: {
     summary: '루터 이전에 종교개혁이 시작된 곳. 얀 후스는 95개조 논제보다 한 세기 전에 교회에 도전했습니다.',
     history: '프라하는 루터 이전에 종교개혁이 시작된 곳입니다. 얀 후스(1369-1415)는 체코의 사제이자 카를 대학교 총장으로, 가톨릭 교회의 부패, 특히 면죄부 판매에 도전했습니다. 그는 콘스탄츠 공의회(1415)에서 이단자로 화형당했습니다. 그의 추종자인 후스파는 유럽을 뒤흔든 전쟁을 일으켰고, 루터 운동의 토대를 놓았습니다.',
@@ -1287,31 +1490,62 @@ function rebuildSidebar() {
     card.id = `card-${stop.id}`;
     if (stop.id === currentDetailId) card.classList.add('active');
 
-    const tags = [];
-    if (stop.reformer) tags.push(`<span class="tag reformer">${stop.reformer}</span>`);
-    if (stop.currency) tags.push(`<span class="tag currency">${stop.currency}</span>`);
-    const sitesList = getField(stop, 'sites');
-    if (sitesList.length > 0) tags.push(`<span class="tag site">${sitesList.length} ${currentLang === 'ko' ? '유적지' : 'sites'}</span>`);
+    if (stop.type === 'flight') {
+      // Flight card rendering
+      const flightsHtml = stop.flights.map(f => `
+        <div class="flight-segment">
+          <div class="flight-route">
+            <span class="flight-code">${f.from}</span>
+            <span class="flight-arrow">&#9992;</span>
+            <span class="flight-code">${f.to}</span>
+          </div>
+          <div>
+            <div class="flight-airline">${f.airline} ${f.number}</div>
+            <div class="flight-time">${f.duration}</div>
+          </div>
+        </div>
+      `).join('');
 
-    const w = weather[stop.id];
-    const weatherHtml = w ? `<div class="weather-badge">${w.icon} ${w.temp} ${currentLang === 'ko' ? w.ko : w.desc}</div>` : '';
+      card.innerHTML = `
+        <div class="type-bar" style="background:#7ab8f5"></div>
+        <div class="day-header">
+          <span class="day-badge flight">${stop.days}</span>
+          <span class="day-city">${currentLang === 'ko' ? (stop.id === 'flight-out' ? '출발 항공편' : '귀국 항공편') : stop.city}</span>
+          <span class="day-date">${stop.dates}</span>
+        </div>
+        ${flightsHtml}
+        <div class="day-tags"><span class="tag flight">${stop.country}</span></div>
+      `;
+    } else {
+      // Normal stop card
+      const tags = [];
+      if (stop.reformer) tags.push(`<span class="tag reformer">${stop.reformer}</span>`);
+      if (stop.currency) tags.push(`<span class="tag currency">${stop.currency}</span>`);
+      const sitesList = getField(stop, 'sites');
+      if (sitesList.length > 0) tags.push(`<span class="tag site">${sitesList.length} ${currentLang === 'ko' ? '유적지' : 'sites'}</span>`);
 
-    card.innerHTML = `
-      <div class="type-bar" style="background:${markerColors[stop.type]}"></div>
-      <div class="day-header">
-        <span class="day-badge ${stop.type}">${stop.days}</span>
-        <span class="day-city">${stop.city}</span>
-        <span class="day-date">${stop.dates}</span>
-      </div>
-      <div class="day-summary">${getField(stop, 'summary')}</div>
-      ${weatherHtml}
-      <div class="day-tags">${tags.join('')}</div>
-    `;
+      const w = weather[stop.id];
+      const weatherHtml = w ? `<div class="weather-badge">${w.icon} ${w.temp} ${currentLang === 'ko' ? w.ko : w.desc}</div>` : '';
+
+      card.innerHTML = `
+        <div class="type-bar" style="background:${markerColors[stop.type]}"></div>
+        <div class="day-header">
+          <span class="day-badge ${stop.type}">${stop.days}</span>
+          <span class="day-city">${stop.city}</span>
+          <span class="day-date">${stop.dates}</span>
+        </div>
+        <div class="day-summary">${getField(stop, 'summary')}</div>
+        ${weatherHtml}
+        <div class="day-tags">${tags.join('')}</div>
+      `;
+    }
 
     card.addEventListener('click', () => {
       showDetail(stop.id);
-      map.flyTo([stop.lat, stop.lng], 10, { duration: 1.2 });
-      markers[stop.id].openPopup();
+      if (stop.lat !== null && markers[stop.id]) {
+        map.flyTo([stop.lat, stop.lng], 10, { duration: 1.2 });
+        markers[stop.id].openPopup();
+      }
     });
 
     sb.appendChild(card);
@@ -1333,43 +1567,104 @@ function showDetail(id) {
 
   const panel = document.getElementById('detail-panel');
   const ui = uiText[currentLang];
-  const sitesList = getField(stop, 'sites');
   const tipsList = getField(stop, 'tips');
-
-  const sitesHtml = sitesList.length > 0
-    ? `<div class="detail-section"><h3>${ui.sites}</h3><ul>${sitesList.map(s => `<li>${s}</li>`).join('')}</ul></div>`
-    : '';
+  const isKo = currentLang === 'ko';
 
   const tipsHtml = tipsList.length > 0
     ? `<div class="detail-section"><h3>${ui.tips}</h3><div class="tip-box"><p>${tipsList.join('<br>')}</p></div></div>`
     : '';
 
-  const imageHtml = stop.image
-    ? `<img class="detail-image" src="${stop.image}" alt="${stop.city}" loading="lazy"><div class="detail-image-caption">${stop.imageCaption || ''}</div>`
-    : '';
-
-  const w = weather[stop.id];
-  const weatherHtml = w
-    ? `<div class="detail-weather"><span class="weather-icon">${w.icon}</span> <strong>${w.temp}</strong> &mdash; ${currentLang === 'ko' ? w.ko : w.desc}</div>`
-    : '';
-
-  panel.innerHTML = `
-    <div class="detail-header">
-      <button class="detail-close" onclick="document.getElementById('detail-panel').style.display='none'; currentDetailId=null;">&times;</button>
-      <h2>${stop.city}, ${stop.country}</h2>
-      <div class="detail-date">${stop.days} &middot; ${stop.dates}</div>
-    </div>
-    <div class="detail-body">
-      ${imageHtml}
-      ${weatherHtml}
-      <div class="detail-section">
-        <h3>${ui.history}</h3>
-        <p>${getField(stop, 'history')}</p>
+  if (stop.type === 'flight') {
+    // Flight detail rendering
+    const flightsHtml = stop.flights.map(f => `
+      <div class="flight-detail-segment">
+        <div class="flight-detail-header">
+          <span class="flight-detail-airline">${f.airline}</span>
+          <span class="flight-detail-number">${f.number}</span>
+        </div>
+        <div class="flight-detail-route">
+          <div class="flight-detail-airport">
+            <div class="airport-code">${f.from}</div>
+            <div class="airport-name">${f.fromName}</div>
+            <div class="airport-time">${f.depart}</div>
+            ${f.terminal_from ? `<div class="airport-name">${f.terminal_from}</div>` : ''}
+          </div>
+          <div class="flight-detail-arrow">&#9992; &#8594;</div>
+          <div class="flight-detail-airport" style="text-align:right">
+            <div class="airport-code">${f.to}</div>
+            <div class="airport-name">${f.toName}</div>
+            <div class="airport-time">${f.arrive}</div>
+            ${f.terminal_to ? `<div class="airport-name">${f.terminal_to}</div>` : ''}
+          </div>
+        </div>
+        <div class="flight-detail-meta">
+          <span>${isKo ? '소요시간' : 'Duration'}: ${f.duration}</span>
+          <span>${isKo ? '좌석' : 'Cabin'}: ${f.cabin}</span>
+        </div>
       </div>
-      ${sitesHtml}
-      ${tipsHtml}
-    </div>
-  `;
+    `).join('');
+
+    const bag = stop.baggage;
+    const baggageHtml = bag ? `
+      <div class="detail-section">
+        <h3>${isKo ? '수하물 정보' : 'Baggage Info'}</h3>
+        <div class="baggage-info">
+          <strong>${isKo ? '기내 수하물' : 'Carry-on'}:</strong> ${bag.carryon}<br>
+          <strong>${isKo ? '위탁 수하물 1' : 'Checked Bag 1'}:</strong> ${bag.checked1}<br>
+          <strong>${isKo ? '위탁 수하물 2' : 'Checked Bag 2'}:</strong> ${bag.checked2}
+        </div>
+      </div>
+    ` : '';
+
+    panel.innerHTML = `
+      <div class="detail-header">
+        <button class="detail-close" onclick="document.getElementById('detail-panel').style.display='none'; currentDetailId=null;">&times;</button>
+        <h2>${isKo ? (stop.id === 'flight-out' ? '출발 항공편' : '귀국 항공편') : stop.city}</h2>
+        <div class="detail-date">${stop.days} &middot; ${stop.dates} &middot; ${stop.country}</div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-section">
+          <h3>${isKo ? '항공편 상세' : 'Flight Details'}</h3>
+          ${flightsHtml}
+        </div>
+        ${baggageHtml}
+        ${tipsHtml}
+      </div>
+    `;
+  } else {
+    // Normal stop detail
+    const sitesList = getField(stop, 'sites');
+    const sitesHtml = sitesList.length > 0
+      ? `<div class="detail-section"><h3>${ui.sites}</h3><ul>${sitesList.map(s => `<li>${s}</li>`).join('')}</ul></div>`
+      : '';
+
+    const imageHtml = stop.image
+      ? `<img class="detail-image" src="${stop.image}" alt="${stop.city}" loading="lazy"><div class="detail-image-caption">${stop.imageCaption || ''}</div>`
+      : '';
+
+    const w = weather[stop.id];
+    const weatherHtml = w
+      ? `<div class="detail-weather"><span class="weather-icon">${w.icon}</span> <strong>${w.temp}</strong> &mdash; ${isKo ? w.ko : w.desc}</div>`
+      : '';
+
+    panel.innerHTML = `
+      <div class="detail-header">
+        <button class="detail-close" onclick="document.getElementById('detail-panel').style.display='none'; currentDetailId=null;">&times;</button>
+        <h2>${stop.city}, ${stop.country}</h2>
+        <div class="detail-date">${stop.days} &middot; ${stop.dates}</div>
+      </div>
+      <div class="detail-body">
+        ${imageHtml}
+        ${weatherHtml}
+        <div class="detail-section">
+          <h3>${ui.history}</h3>
+          <p>${getField(stop, 'history')}</p>
+        </div>
+        ${sitesHtml}
+        ${tipsHtml}
+      </div>
+    `;
+  }
 
   panel.style.display = 'block';
 }
