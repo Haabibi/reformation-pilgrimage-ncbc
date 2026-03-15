@@ -401,6 +401,46 @@
     color: #fff;
   }
 
+  .timezone-banner {
+    background: #1a2744;
+    border-bottom: 1px solid #2a2a4a;
+    padding: 6px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    font-size: 0.75rem;
+    color: #a0a0c0;
+    flex-shrink: 0;
+  }
+
+  .tz-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tz-clock .tz-time {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tz-clock .tz-label {
+    color: #7a7a9a;
+  }
+
+  .tz-divider {
+    color: #3a3a5a;
+    font-size: 0.9rem;
+  }
+
+  .tz-diff {
+    color: #f0c060;
+    font-weight: 500;
+  }
+
   .weather-badge {
     display: inline-flex;
     align-items: center;
@@ -526,11 +566,17 @@
     .day-city { font-size: 1rem; }
   }
 
+  @media (max-width: 768px) {
+    .timezone-banner { padding: 5px 16px; gap: 12px; font-size: 0.7rem; }
+    .tz-clock .tz-time { font-size: 0.8rem; }
+  }
+
   /* Small phones */
   @media (max-width: 400px) {
     header h1 { font-size: 1rem; }
     header .subtitle { font-size: 0.7rem; }
     .lang-btn { padding: 3px 8px; font-size: 0.7rem; }
+    .timezone-banner { gap: 8px; }
   }
 </style>
 </head>
@@ -551,6 +597,18 @@
   </div>
 </header>
 
+<div class="timezone-banner" id="tz-banner">
+  <div class="tz-clock">
+    <span class="tz-label" id="tz-home-label">PDT</span>
+    <span class="tz-time" id="tz-home-time">--:--</span>
+  </div>
+  <span class="tz-divider">|</span>
+  <div class="tz-clock">
+    <span class="tz-label" id="tz-euro-label">CET</span>
+    <span class="tz-time" id="tz-euro-time">--:--</span>
+  </div>
+  <span class="tz-diff" id="tz-diff">+8h</span>
+</div>
 <div class="mobile-tabs" id="mobile-tabs">
   <button class="active" id="tab-list" onclick="switchTab('list')">Itinerary</button>
   <button id="tab-map" onclick="switchTab('map')">Map</button>
@@ -1355,6 +1413,36 @@ showDetail = function(id) {
   if (window.innerWidth <= 768) {
     // Don't auto-switch to map on mobile — keep the detail panel fullscreen overlay
   }
+};
+
+// Timezone clocks
+// During the trip (Mar 16-27, 2026): US is PDT (UTC-7), Europe is CET (UTC+1) = +8h difference
+// Europe doesn't switch to CEST until Mar 29
+function updateClocks() {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+
+  // PDT = UTC-7, CET = UTC+1
+  const pdt = new Date(utc - 7 * 3600000);
+  const cet = new Date(utc + 1 * 3600000);
+
+  const fmt = (d) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+  document.getElementById('tz-home-time').textContent = fmt(pdt);
+  document.getElementById('tz-euro-time').textContent = fmt(cet);
+}
+
+updateClocks();
+setInterval(updateClocks, 30000);
+
+// Update timezone labels on language switch
+const origSetLang2 = setLang;
+setLang = function(lang) {
+  origSetLang2(lang);
+  document.getElementById('tz-home-label').textContent = lang === 'ko' ? '미국 PDT' : 'PDT';
+  document.getElementById('tz-euro-label').textContent = lang === 'ko' ? '유럽 CET' : 'CET';
+  const diffEl = document.getElementById('tz-diff');
+  diffEl.textContent = lang === 'ko' ? '+8시간' : '+8h';
 };
 
 // Initial sidebar build
