@@ -296,6 +296,37 @@
 
   .baggage-info strong { color: #f0c060; }
 
+  .food-item, .shop-item {
+    padding: 6px 0;
+    padding-left: 16px;
+    position: relative;
+    font-size: 0.85rem;
+    color: #c0c0e0;
+    line-height: 1.6;
+  }
+
+  .food-item::before {
+    content: '🍽';
+    position: absolute;
+    left: -2px;
+    font-size: 0.7rem;
+  }
+
+  .shop-item::before {
+    content: '🛍';
+    position: absolute;
+    left: -2px;
+    font-size: 0.7rem;
+  }
+
+  .food-item .item-name, .shop-item .item-name {
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .detail-section h3.food-header { color: #6fcf97; }
+  .detail-section h3.shop-header { color: #f0c060; }
+
   #map {
     flex: 1;
     z-index: 1;
@@ -787,6 +818,18 @@ const stops = [
     reformer: 'Jan Hus',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Prague_07-2016_View_from_Old_Town_Hall_Tower_img3.jpg/960px-Prague_07-2016_View_from_Old_Town_Hall_Tower_img3.jpg',
     imageCaption: 'Old Town Square, Prague — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Trdelník</span> — Chimney cake pastry, crispy and sweet, sold everywhere in Old Town',
+      '<span class="item-name">Svíčková</span> — Marinated beef sirloin with creamy vegetable sauce and dumplings',
+      '<span class="item-name">Vepřo-knedlo-zelo</span> — Roast pork with dumplings and sauerkraut (classic comfort food)',
+      '<span class="item-name">Medovník</span> — Czech honey cake, layered with cream'
+    ],
+    shopping: [
+      '<span class="item-name">Bohemian Crystal</span> — World-famous Czech glass and crystal; Moser is the premium brand',
+      '<span class="item-name">Garnet Jewelry</span> — Czech garnets (Granát) are a local specialty; buy from certified shops',
+      '<span class="item-name">Wooden Toys & Marionettes</span> — Traditional Czech puppets make unique gifts',
+      '<span class="item-name">Czech Honey & Spa Wafers</span> — Karlovy Vary wafers and local honey make great edible gifts'
+    ],
     summary: 'Where the Reformation began before Luther. Jan Hus challenged the Church a full century before the 95 Theses.',
     history: 'Prague is where the Reformation began before Luther. Jan Hus (1369-1415) was a Czech priest and rector of Charles University who challenged the Catholic Church\'s corruption — especially the sale of indulgences — a full century before Luther. He was burned at the stake as a heretic at the Council of Constance (1415). His followers, the Hussites, launched wars that shook Europe and laid the groundwork for Luther\'s movement.',
     sites: [
@@ -814,6 +857,13 @@ const stops = [
     reformer: 'Martin Luther',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Schlosskirche_Wittenberg_Luftbild_2024_Toni_Klemm.jpg/960px-Schlosskirche_Wittenberg_Luftbild_2024_Toni_Klemm.jpg',
     imageCaption: 'Castle Church (Schlosskirche), Wittenberg — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Bratwurst</span> — Classic German grilled sausage; try it from a street stall',
+      '<span class="item-name">German Bread (Brot)</span> — Germany has 3,000+ bread varieties; try a fresh pretzel or Vollkornbrot'
+    ],
+    shopping: [
+      '<span class="item-name">Reformation Souvenirs</span> — Luther figurines, 95 Theses prints, and Reformation-themed items at the Lutherhaus gift shop'
+    ],
     summary: 'Birthplace of the Protestant Reformation. Luther nailed his 95 Theses to the Castle Church door in 1517.',
     history: 'The birthplace of the Protestant Reformation. On October 31, 1517, Martin Luther nailed his 95 Theses to the door of the Castle Church, challenging the sale of indulgences. Wittenberg was where Luther lived, taught, and developed his theology of salvation by grace through faith alone (sola gratia, sola fide).',
     sites: [
@@ -841,6 +891,15 @@ const stops = [
     reformer: 'Luther / Bach',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Thomaskirche_Leipzig_Westseite_2013.jpg/960px-Thomaskirche_Leipzig_Westseite_2013.jpg',
     imageCaption: 'St. Thomas Church (Thomaskirche), Leipzig — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Leipziger Lerche</span> — Shortcrust pastry with almond filling and strawberry jam; a Leipzig icon',
+      '<span class="item-name">Leipziger Allerlei</span> — Mixed vegetable stew, a traditional regional specialty',
+      '<span class="item-name">Auerbachs Keller</span> — Historic restaurant featured in Goethe\'s Faust; operating since 1525'
+    ],
+    shopping: [
+      '<span class="item-name">Bach Memorabilia</span> — Music-themed gifts at the Bach Museum shop',
+      '<span class="item-name">Leipzig Porcelain</span> — Fine porcelain from the Saxony region'
+    ],
     summary: 'Site of the Leipzig Debate (1519) where Luther was pushed to radicalize his break from Rome.',
     history: 'Leipzig hosted the Leipzig Debate (1519), where Luther debated theologian Johann Eck. During this debate, Luther was pushed to admit he agreed with some of Jan Hus\'s positions — connecting Prague to Wittenberg historically. This debate radicalized Luther\'s break from Rome. Leipzig was also where J.S. Bach later served as cantor.',
     sites: [
@@ -865,6 +924,15 @@ const stops = [
     reformer: 'Martin Luther',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/2021-09-16_Erfurt_bei_Nacht_1DX_3974_by_Stepro.jpg/960px-2021-09-16_Erfurt_bei_Nacht_1DX_3974_by_Stepro.jpg',
     imageCaption: 'Erfurt Cathedral — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Thüringer Bratwurst</span> — Thuringian grilled sausage, longer and spicier than other German varieties',
+      '<span class="item-name">Thüringer Klöße</span> — Thuringian potato dumplings, a regional staple',
+      '<span class="item-name">Rostbrätel</span> — Marinated grilled pork neck steak, a Thuringian classic'
+    ],
+    shopping: [
+      '<span class="item-name">Krämerbrücke Shops</span> — Browse artisan crafts, ceramics, and local goods on the medieval Merchants\' Bridge',
+      '<span class="item-name">Thuringian Mustard</span> — Born Senf brand, a famous local mustard'
+    ],
     summary: 'Where Luther\'s spiritual journey began. He became a monk at the Augustinian Monastery in 1505.',
     history: 'Erfurt is where Luther\'s spiritual journey began. He studied at the University of Erfurt (1501-1505), and after a terrifying thunderstorm, vowed to become a monk. He entered the Augustinian Monastery in 1505, where he underwent intense spiritual struggles (Anfechtungen) about sin, guilt, and God\'s righteousness — the struggles that led to his breakthrough understanding of justification by faith.',
     sites: [
@@ -890,6 +958,13 @@ const stops = [
     reformer: 'Martin Luther',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Thuringia_Eisenach_asv2020-07_img23_Wartburg_Castle.jpg/960px-Thuringia_Eisenach_asv2020-07_img23_Wartburg_Castle.jpg',
     imageCaption: 'Wartburg Castle, Eisenach — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Thüringer Rostbratwurst</span> — Must-try at the castle or town center stalls',
+      '<span class="item-name">Eisenacher Kräuterkuchen</span> — Local herb cake specialty'
+    ],
+    shopping: [
+      '<span class="item-name">Wartburg Castle Gift Shop</span> — Luther-themed souvenirs, medieval replicas, and local crafts'
+    ],
     summary: 'Luther hid at Wartburg Castle and translated the New Testament into German in just 11 weeks.',
     history: 'After the Diet of Worms (1521), Luther was "kidnapped" by allies and hidden at Wartburg Castle for nearly a year. Disguised as "Junker Jörg" (Knight George), Luther translated the New Testament from Greek into German in just 11 weeks — a landmark achievement that standardized the German language and put Scripture into ordinary people\'s hands.',
     sites: [
@@ -915,6 +990,14 @@ const stops = [
     reformer: '',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/R%C3%B6merberg_Frankfurt_abends.jpg/960px-R%C3%B6merberg_Frankfurt_abends.jpg',
     imageCaption: 'Römerberg, Frankfurt — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Grüne Soße</span> — Cold green herb sauce with eggs and potatoes, a Frankfurt classic',
+      '<span class="item-name">Frankfurter Würstchen</span> — The original frankfurter sausage, smoked and delicate',
+      '<span class="item-name">Frankfurter Kranz</span> — Buttercream cake ring topped with caramelized nuts'
+    ],
+    shopping: [
+      '<span class="item-name">Bembel Stoneware</span> — Traditional blue-grey stoneware pottery, a classic Frankfurt craft'
+    ],
     summary: 'Transit stop. The printing industry here helped spread Reformation ideas across Europe.',
     history: 'Frankfurt was not a primary Reformation city, but it hosted important Imperial Diets and was a center of the printing industry that spread Reformation ideas. The Frankfurt Book Fair became a channel for distributing Protestant writings across Europe.',
     sites: [],
@@ -935,6 +1018,14 @@ const stops = [
     reformer: 'Martin Luther',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Lutherdenkmal_Worms_01.jpg/960px-Lutherdenkmal_Worms_01.jpg',
     imageCaption: 'Luther Monument, Worms — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Backfisch</span> — Fried fish sandwich, a Rhine river specialty',
+      '<span class="item-name">Flammkuchen</span> — Thin-crust flatbread with cream, onions, and toppings; like a German pizza',
+      '<span class="item-name">Spundekäs</span> — Creamy cheese dip with pretzels, a Rheinhessen classic'
+    ],
+    shopping: [
+      '<span class="item-name">Luther Monument Postcards & Books</span> — Reformation-themed books and prints from the visitor shop'
+    ],
     summary: '"Here I stand, I can do no other." Luther\'s dramatic stand before Emperor Charles V at the Diet of Worms.',
     history: 'One of the most dramatic moments in church history. At the Diet of Worms (1521), Luther stood before Emperor Charles V and the assembled princes and refused to recant. His famous declaration: "Here I stand, I can do no other. God help me. Amen." He was declared an outlaw, but this moment cemented the Reformation\'s survival.',
     sites: [
@@ -960,6 +1051,16 @@ const stops = [
     reformer: 'Huldrych Zwingli',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Grossm%C3%BCnster_Zurich_Switzerland_24Jun2021.jpg/960px-Grossm%C3%BCnster_Zurich_Switzerland_24Jun2021.jpg',
     imageCaption: 'Grossmünster, Zurich — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Züri Geschnetzeltes</span> — Sliced veal in creamy mushroom sauce with rösti, Zurich\'s signature dish',
+      '<span class="item-name">Luxemburgerli</span> — Delicate macarons from Confiserie Sprüngli; a must-buy',
+      '<span class="item-name">Fondue & Raclette</span> — Classic Swiss cheese dishes; try at a traditional restaurant'
+    ],
+    shopping: [
+      '<span class="item-name">Sprüngli Chocolate</span> — Premium Swiss chocolate from the iconic Bahnhofstrasse shop; gift boxes available',
+      '<span class="item-name">Swiss Watches</span> — Window-shop or buy on Bahnhofstrasse, one of the world\'s most exclusive shopping streets',
+      '<span class="item-name">Grossmünster Gift Shop</span> — Reformation-themed souvenirs and Zwingli memorabilia'
+    ],
     summary: 'Center of the Swiss Reformation under Zwingli. Also birthplace of the Anabaptist movement.',
     history: 'Zurich was the center of the Swiss Reformation under Huldrych Zwingli (1484-1531). Zwingli reformed Zurich independently of Luther, beginning in 1519. He emphasized Scripture\'s authority, removed images from churches, and clashed with Luther over the Lord\'s Supper. Zurich was also where the Anabaptist movement began (1525), led by Conrad Grebel and Felix Manz.',
     sites: [
@@ -986,6 +1087,15 @@ const stops = [
     reformer: '',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Luzern_Kapellbruecke.jpg/960px-Luzern_Kapellbruecke.jpg',
     imageCaption: 'Chapel Bridge (Kapellbrücke), Lucerne — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Luzerner Chügelipastete</span> — Vol-au-vent filled with veal, mushrooms, and cream sauce; Lucerne\'s signature dish',
+      '<span class="item-name">Swiss Cheese Fondue</span> — A must in the lakeside setting'
+    ],
+    shopping: [
+      '<span class="item-name">Swiss Watches & Clocks</span> — Bucherer flagship store is right by Chapel Bridge',
+      '<span class="item-name">Swiss Chocolate</span> — Läderach and Bachmann for artisan chocolate; gift boxes available',
+      '<span class="item-name">Music Boxes</span> — Traditional Swiss music boxes and wooden crafts'
+    ],
     summary: 'Remained staunchly Catholic. Its Jesuit Church symbolizes the Counter-Reformation.',
     history: 'Lucerne remained staunchly Catholic during the Reformation and was a leading member of the Catholic cantons opposing Zurich. The religious divide led to the Kappel Wars — the conflict in which Zwingli was killed. Lucerne\'s Jesuit Church (built 1666-1677) was the first large Baroque church in Switzerland, symbolizing the Counter-Reformation.',
     sites: [
@@ -1010,6 +1120,15 @@ const stops = [
     reformer: 'John Calvin',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Reformation_Wall_Geneva_Flip_%28186260559%29.jpeg/960px-Reformation_Wall_Geneva_Flip_%28186260559%29.jpeg',
     imageCaption: 'Reformation Wall, Geneva — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Filets de Perche</span> — Pan-fried Lake Geneva perch fillets, a local delicacy',
+      '<span class="item-name">Longeole</span> — Geneva\'s traditional pork and fennel sausage (IGP protected)',
+      '<span class="item-name">Swiss Chocolate</span> — Visit Favarger or Stettler chocolatiers'
+    ],
+    shopping: [
+      '<span class="item-name">Swiss Watches</span> — Geneva is the capital of Swiss watchmaking; Patek Philippe museum is nearby',
+      '<span class="item-name">Reformation Museum Gift Shop</span> — Unique Calvin and Reformation-themed souvenirs'
+    ],
     summary: 'The "Protestant Rome" under John Calvin. His theology shaped Presbyterianism and modern democracy.',
     history: 'Geneva became the "Protestant Rome" under John Calvin (1509-1564). The French-born theologian arrived in 1536 and transformed Geneva into a model Reformed city. Calvin\'s theology — predestination, God\'s sovereignty, church discipline — profoundly influenced Presbyterianism, the Reformed tradition, Puritanism, and the shaping of modern democracy.',
     sites: [
@@ -1037,6 +1156,17 @@ const stops = [
     reformer: 'Carlo Borromeo',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg/960px-Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg',
     imageCaption: 'The Last Supper by Leonardo da Vinci, Cenacolo Vinciano — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Risotto alla Milanese</span> — Saffron-infused creamy risotto, Milan\'s signature dish',
+      '<span class="item-name">Cotoletta alla Milanese</span> — Breaded veal cutlet (the original Wiener Schnitzel)',
+      '<span class="item-name">Ossobuco</span> — Braised veal shanks; pair with risotto for the classic combo',
+      '<span class="item-name">Panettone</span> — Milan invented this iconic sweet bread; buy fresh from a bakery'
+    ],
+    shopping: [
+      '<span class="item-name">Galleria Vittorio Emanuele II</span> — Italy\'s oldest shopping gallery with luxury brands',
+      '<span class="item-name">Italian Leather Goods</span> — Bags, belts, and wallets at better prices than back home',
+      '<span class="item-name">Panettone</span> — Bring home a fresh panettone from Marchesi or Cova bakery'
+    ],
     summary: 'Counter-Reformation stronghold. Visit Cenacolo Vinciano (The Last Supper) on 3/24 at 9:30 AM.',
     history: 'Home of St. Ambrose and later Carlo Borromeo, the Counter-Reformation archbishop who implemented the reforms of the Council of Trent most rigorously. Milan represents the Catholic response to Protestantism. The city is also home to Leonardo da Vinci\'s masterpiece The Last Supper (1495-1498), housed in the refectory of Santa Maria delle Grazie.',
     sites: [
@@ -1063,6 +1193,17 @@ const stops = [
     reformer: 'Savonarola',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Palazzo_vecchio_Florence.jpg/960px-Palazzo_vecchio_Florence.jpg',
     imageCaption: 'Piazza della Signoria, Florence — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Bistecca alla Fiorentina</span> — Giant T-bone steak, charcoal-grilled and rare; a must-try',
+      '<span class="item-name">Lampredotto</span> — Tripe sandwich from street carts; a true Florentine street food',
+      '<span class="item-name">Gelato</span> — Try Vivoli or Gelateria dei Neri for authentic artisan gelato',
+      '<span class="item-name">Ribollita</span> — Hearty Tuscan bread and vegetable soup'
+    ],
+    shopping: [
+      '<span class="item-name">Leather Goods</span> — San Lorenzo Market and Santa Croce leather school for quality Italian leather',
+      '<span class="item-name">Florentine Paper (Carta Fiorentina)</span> — Marbled paper journals and stationery; Il Papiro is iconic',
+      '<span class="item-name">Tuscan Olive Oil</span> — High-quality extra virgin olive oil, great gift to bring home'
+    ],
     summary: 'Savonarola preached against Church corruption decades before Luther. Burned at the stake in 1498.',
     history: 'Girolamo Savonarola (1452-1498) was a Dominican friar who preached against corruption in the church and secular society decades before Luther. He briefly ruled Florence as a theocracy before being excommunicated and burned at the stake. Luther admired Savonarola as a proto-reformer.',
     sites: [
@@ -1085,6 +1226,18 @@ const stops = [
     reformer: '',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IT2_11_12_St_Peters_Basilica_Rome_small.jpg/960px-IT2_11_12_St_Peters_Basilica_Rome_small.jpg',
     imageCaption: 'St. Peter\'s Basilica, Rome — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Cacio e Pepe</span> — Simple Roman pasta with pecorino cheese and black pepper; perfection',
+      '<span class="item-name">Carbonara</span> — The original Roman carbonara (egg, guanciale, pecorino)',
+      '<span class="item-name">Supplì</span> — Fried rice balls with mozzarella; classic Roman street food',
+      '<span class="item-name">Pizza al Taglio</span> — Roman-style pizza by the slice; try near the Vatican',
+      '<span class="item-name">Gelato</span> — Giolitti (since 1900) or Fatamorgana for creative flavors'
+    ],
+    shopping: [
+      '<span class="item-name">Religious Items</span> — Rosaries, icons, and papal blessings near the Vatican',
+      '<span class="item-name">Italian Leather</span> — Bags and wallets from artisan shops in Trastevere',
+      '<span class="item-name">Artisan Pasta</span> — Beautifully packaged dried pasta makes a great edible souvenir'
+    ],
     summary: 'Where the corruption Luther protested was centered. The indulgences funding St. Peter\'s triggered the 95 Theses.',
     history: 'Rome is where the corruption Luther protested was centered. The sale of indulgences to fund St. Peter\'s Basilica was the direct trigger for the 95 Theses. Pope Leo X excommunicated Luther in 1521. Luther visited Rome in 1510 as a young monk and was shocked by the corruption he witnessed — planting seeds of his later protest.',
     sites: [
@@ -1114,6 +1267,16 @@ const stops = [
     reformer: '',
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Pompeii%2C_Italy_102.jpg/960px-Pompeii%2C_Italy_102.jpg',
     imageCaption: 'Ruins of Pompeii — Wikimedia Commons',
+    food: [
+      '<span class="item-name">Neapolitan Pizza</span> — Naples is the birthplace of pizza; Da Michele or Sorbillo are legendary',
+      '<span class="item-name">Sfogliatella</span> — Flaky shell-shaped pastry filled with ricotta; a Neapolitan icon',
+      '<span class="item-name">Mozzarella di Bufala</span> — Fresh buffalo mozzarella from the Campania region'
+    ],
+    shopping: [
+      '<span class="item-name">Cameo Jewelry</span> — Sorrento is famous for hand-carved shell cameos',
+      '<span class="item-name">Ceramics</span> — Colorful hand-painted Amalfi coast ceramics',
+      '<span class="item-name">Limone Products</span> — Lemon soap, lemon candy, and lemon ceramics from Sorrento'
+    ],
     summary: 'Day trip from Rome — sightseeing, not reformation-related.',
     history: 'A day trip from Rome primarily for sightseeing. Not directly related to the Reformation story.',
     sites: [],
@@ -1638,6 +1801,16 @@ function showDetail(id) {
       ? `<div class="detail-section"><h3>${ui.sites}</h3><ul>${sitesList.map(s => `<li>${s}</li>`).join('')}</ul></div>`
       : '';
 
+    const foodList = getField(stop, 'food') || [];
+    const foodHtml = foodList.length > 0
+      ? `<div class="detail-section"><h3 class="food-header">${isKo ? '추천 음식' : 'Local Food'}</h3><ul>${foodList.map(f => `<li class="food-item">${f}</li>`).join('')}</ul></div>`
+      : '';
+
+    const shopList = getField(stop, 'shopping') || [];
+    const shopHtml = shopList.length > 0
+      ? `<div class="detail-section"><h3 class="shop-header">${isKo ? '쇼핑 추천' : 'What to Buy'}</h3><ul>${shopList.map(s => `<li class="shop-item">${s}</li>`).join('')}</ul></div>`
+      : '';
+
     const imageHtml = stop.image
       ? `<img class="detail-image" src="${stop.image}" alt="${stop.city}" loading="lazy"><div class="detail-image-caption">${stop.imageCaption || ''}</div>`
       : '';
@@ -1661,6 +1834,8 @@ function showDetail(id) {
           <p>${getField(stop, 'history')}</p>
         </div>
         ${sitesHtml}
+        ${foodHtml}
+        ${shopHtml}
         ${tipsHtml}
       </div>
     `;
