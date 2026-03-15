@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>European Reformation Pilgrimage</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { height: 100%; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  header {
+    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    padding: 16px 32px;
+    border-bottom: 2px solid #e94560;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  header .subtitle {
+    font-size: 0.85rem;
+    color: #a0a0c0;
+    font-weight: 300;
+  }
+
+  .legend {
+    margin-left: auto;
+    display: flex;
+    gap: 16px;
+    font-size: 0.75rem;
+    color: #a0a0c0;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  #sidebar {
+    width: 380px;
+    background: #16213e;
+    overflow-y: auto;
+    flex-shrink: 0;
+    border-right: 1px solid #2a2a4a;
+  }
+
+  #sidebar::-webkit-scrollbar { width: 6px; }
+  #sidebar::-webkit-scrollbar-track { background: #16213e; }
+  #sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 3px; }
+
+  .day-card {
+    padding: 16px 20px 16px 24px;
+    border-bottom: 1px solid #2a2a4a;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .day-card:hover { background: #1a2744; }
+  .day-card.active { background: #1a2744; border-left: 3px solid #e94560; }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .day-badge {
+    background: #e94560;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .day-badge.protestant { background: #e94560; }
+  .day-badge.swiss { background: #6fcf97; color: #1a1a2e; }
+  .day-badge.catholic { background: #f0c060; color: #1a1a2e; }
+  .day-badge.transit { background: #0f3460; border: 1px solid #7a7aaa; }
+
+  .day-card .type-bar {
+    width: 4px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 2px 0 0 2px;
+  }
+
+  .day-card {
+    position: relative;
+  }
+
+  .day-city {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #fff;
+  }
+
+  .day-date {
+    font-size: 0.75rem;
+    color: #7a7a9a;
+    margin-left: auto;
+  }
+
+  .day-summary {
+    font-size: 0.8rem;
+    color: #a0a0c0;
+    line-height: 1.5;
+  }
+
+  .day-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .tag {
+    font-size: 0.65rem;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: #2a2a4a;
+    color: #c0c0e0;
+  }
+
+  .tag.reformer { background: #1a3a2a; color: #6fcf97; }
+  .tag.site { background: #2a2a3a; color: #a0a0f0; }
+  .tag.currency { background: #3a2a1a; color: #f0c060; }
+
+  #map {
+    flex: 1;
+    z-index: 1;
+  }
+
+  /* Detail panel overlay */
+  #detail-panel {
+    display: none;
+    position: absolute;
+    right: 16px;
+    top: 80px;
+    width: 400px;
+    max-height: calc(100vh - 120px);
+    background: #16213eee;
+    backdrop-filter: blur(12px);
+    border: 1px solid #3a3a5a;
+    border-radius: 12px;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  #detail-panel::-webkit-scrollbar { width: 6px; }
+  #detail-panel::-webkit-scrollbar-track { background: transparent; }
+  #detail-panel::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 3px; }
+
+  .detail-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #2a2a4a;
+    position: sticky;
+    top: 0;
+    background: #16213ef0;
+    backdrop-filter: blur(12px);
+  }
+
+  .detail-close {
+    float: right;
+    background: none;
+    border: none;
+    color: #a0a0c0;
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  .detail-close:hover { color: #fff; }
+
+  .detail-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .detail-header .detail-date {
+    font-size: 0.8rem;
+    color: #e94560;
+  }
+
+  .detail-body { padding: 20px 24px; }
+
+  .detail-image {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    object-fit: cover;
+    max-height: 220px;
+    display: block;
+  }
+
+  .detail-image-caption {
+    font-size: 0.7rem;
+    color: #7a7a9a;
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  .detail-section {
+    margin-bottom: 20px;
+  }
+
+  .detail-section h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e94560;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .detail-section p, .detail-section li {
+    font-size: 0.85rem;
+    color: #c0c0e0;
+    line-height: 1.7;
+  }
+
+  .detail-section ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .detail-section li {
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .detail-section li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #e94560;
+  }
+
+  .site-name {
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .tip-box {
+    background: #1a2744;
+    border-left: 3px solid #f0c060;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin-top: 8px;
+  }
+
+  .tip-box p {
+    font-size: 0.8rem;
+    color: #c0c0d0;
+    line-height: 1.6;
+  }
+
+  /* Custom map markers */
+  .custom-marker {
+    background: none;
+    border: none;
+  }
+
+  .marker-pin {
+    width: 28px;
+    height: 28px;
+    border-radius: 50% 50% 50% 0;
+    background: #e94560;
+    position: relative;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .marker-pin .marker-day {
+    transform: rotate(45deg);
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .marker-pin.protestant { background: #e94560; }
+  .marker-pin.catholic { background: #f0c060; }
+  .marker-pin.swiss { background: #6fcf97; }
+  .marker-pin.transit { background: #7a7aaa; }
+
+  /* Leaflet popup overrides */
+  .leaflet-popup-content-wrapper {
+    background: #16213eee;
+    border: 1px solid #3a3a5a;
+    border-radius: 8px;
+    color: #e0e0e0;
+  }
+
+  .leaflet-popup-tip { background: #16213eee; }
+
+  .leaflet-popup-content {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 12px 16px;
+  }
+
+  .leaflet-popup-content h3 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 4px;
+    color: #fff;
+  }
+
+  .leaflet-popup-content .popup-date { color: #e94560; font-size: 0.75rem; }
+  .leaflet-popup-content .popup-desc { color: #c0c0e0; margin-top: 6px; }
+  .leaflet-popup-content .popup-link {
+    color: #e94560;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  .leaflet-popup-content .popup-link:hover { text-decoration: underline; }
+
+  .lang-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 16px;
+    background: #2a2a4a;
+    border-radius: 20px;
+    padding: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .lang-btn {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #a0a0c0;
+    background: transparent;
+  }
+
+  .lang-btn.active {
+    background: #e94560;
+    color: #fff;
+  }
+
+  .weather-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #7ab8f5;
+    margin-top: 6px;
+  }
+
+  .detail-weather {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #1a2744;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+    color: #7ab8f5;
+  }
+
+  .detail-weather .weather-icon { font-size: 1.4rem; }
+
+  /* Mobile tab bar */
+  .mobile-tabs {
+    display: none;
+    background: #16213e;
+    border-bottom: 1px solid #2a2a4a;
+    flex-shrink: 0;
+  }
+
+  .mobile-tabs button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: #7a7a9a;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .mobile-tabs button.active {
+    color: #e94560;
+    border-bottom-color: #e94560;
+  }
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    header { padding: 12px 20px; gap: 12px; }
+    header h1 { font-size: 1.3rem; }
+    #sidebar { width: 320px; }
+    #detail-panel { width: 360px; }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    header {
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      gap: 8px;
+    }
+
+    header h1 { font-size: 1.15rem; width: auto; }
+    header .subtitle { font-size: 0.75rem; order: 3; width: 100%; }
+
+    .legend { display: none; }
+
+    .lang-toggle {
+      margin-left: auto;
+      order: 2;
+    }
+
+    .main-container {
+      flex-direction: column;
+      position: relative;
+    }
+
+    .mobile-tabs { display: flex; }
+
+    #sidebar {
+      width: 100%;
+      flex: 1;
+      overflow-y: auto;
+      display: block;
+    }
+
+    #sidebar.hidden { display: none; }
+
+    #map {
+      flex: 1;
+      min-height: 0;
+      display: none;
+    }
+
+    #map.visible {
+      display: block;
+      height: 100%;
+    }
+
+    #detail-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-height: 100vh;
+      border-radius: 0;
+      z-index: 2000;
+    }
+
+    .detail-header { padding: 16px; }
+    .detail-body { padding: 16px; }
+    .detail-close { font-size: 1.6rem; padding: 4px 8px; }
+    .detail-header h2 { font-size: 1.2rem; }
+
+    .day-card { padding: 14px 16px 14px 20px; }
+    .day-header { gap: 8px; }
+    .day-city { font-size: 1rem; }
+  }
+
+  /* Small phones */
+  @media (max-width: 400px) {
+    header h1 { font-size: 1rem; }
+    header .subtitle { font-size: 0.7rem; }
+    .lang-btn { padding: 3px 8px; font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>European Reformation Pilgrimage</h1>
+  <span class="subtitle">March 16 - 27, 2026 &middot; 12 Days &middot; 6 Countries</span>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#e94560"></span> Protestant</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#6fcf97"></span> Swiss Reform</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f0c060"></span> Catholic / Counter-Ref</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#7a7aaa"></span> Transit</div>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-ko" onclick="setLang('ko')">KO</button>
+  </div>
+</header>
+
+<div class="mobile-tabs" id="mobile-tabs">
+  <button class="active" id="tab-list" onclick="switchTab('list')">Itinerary</button>
+  <button id="tab-map" onclick="switchTab('map')">Map</button>
+</div>
+<div class="main-container">
+  <div id="sidebar"></div>
+  <div id="map"></div>
+  <div id="detail-panel"></div>
+</div>
+
+<script>
+const stops = [
+  {
+    id: 'prague',
+    city: 'Prague',
+    country: 'Czech Republic',
+    days: 'Day 1-2',
+    dates: 'Mar 16-17',
+    lat: 50.0755, lng: 14.4378,
+    type: 'protestant',
+    currency: 'CZK',
+    reformer: 'Jan Hus',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Prague_07-2016_View_from_Old_Town_Hall_Tower_img3.jpg/960px-Prague_07-2016_View_from_Old_Town_Hall_Tower_img3.jpg',
+    imageCaption: 'Old Town Square, Prague — Wikimedia Commons',
+    summary: 'Where the Reformation began before Luther. Jan Hus challenged the Church a full century before the 95 Theses.',
+    history: 'Prague is where the Reformation began before Luther. Jan Hus (1369-1415) was a Czech priest and rector of Charles University who challenged the Catholic Church\'s corruption — especially the sale of indulgences — a full century before Luther. He was burned at the stake as a heretic at the Council of Constance (1415). His followers, the Hussites, launched wars that shook Europe and laid the groundwork for Luther\'s movement.',
+    sites: [
+      '<span class="site-name">Bethlehem Chapel</span> — Where Hus preached in Czech (not Latin)',
+      '<span class="site-name">Old Town Square</span> — Jan Hus Memorial statue at the center',
+      '<span class="site-name">Charles University (Karolinum)</span> — Where Hus served as rector',
+      '<span class="site-name">Tyn Church</span> — Hussite church with chalice symbol'
+    ],
+    tips: [
+      'Uses Czech Koruna (CZK), not Euro. Cards widely accepted.',
+      'Buy a 72-hour pass for trams/metro.',
+      'March weather: ~2-10°C, bring layers.',
+      'Old Town is walkable; most sites are close together.'
+    ]
+  },
+  {
+    id: 'wittenberg',
+    city: 'Wittenberg',
+    country: 'Germany',
+    days: 'Day 3',
+    dates: 'Mar 18',
+    lat: 51.8663, lng: 12.6431,
+    type: 'protestant',
+    currency: 'EUR',
+    reformer: 'Martin Luther',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Schlosskirche_Wittenberg_Luftbild_2024_Toni_Klemm.jpg/960px-Schlosskirche_Wittenberg_Luftbild_2024_Toni_Klemm.jpg',
+    imageCaption: 'Castle Church (Schlosskirche), Wittenberg — Wikimedia Commons',
+    summary: 'Birthplace of the Protestant Reformation. Luther nailed his 95 Theses to the Castle Church door in 1517.',
+    history: 'The birthplace of the Protestant Reformation. On October 31, 1517, Martin Luther nailed his 95 Theses to the door of the Castle Church, challenging the sale of indulgences. Wittenberg was where Luther lived, taught, and developed his theology of salvation by grace through faith alone (sola gratia, sola fide).',
+    sites: [
+      '<span class="site-name">Castle Church (Schlosskirche)</span> — The famous 95 Theses door; Luther\'s tomb inside',
+      '<span class="site-name">St. Mary\'s Church</span> — "Mother church of the Reformation"',
+      '<span class="site-name">Luther House (Lutherhaus)</span> — World\'s largest Reformation museum',
+      '<span class="site-name">Melanchthon House</span> — Home of Luther\'s closest collaborator',
+      '<span class="site-name">Luther Oak</span> — Where Luther burned the papal bull (1520)'
+    ],
+    tips: [
+      'Small town — all sites within walking distance.',
+      'Limited time in transit; prioritize Castle Church + Lutherhaus.',
+      'Germany uses Euro.'
+    ]
+  },
+  {
+    id: 'leipzig',
+    city: 'Leipzig',
+    country: 'Germany',
+    days: 'Day 3-4',
+    dates: 'Mar 18-19',
+    lat: 51.3397, lng: 12.3731,
+    type: 'protestant',
+    currency: 'EUR',
+    reformer: 'Luther / Bach',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Thomaskirche_Leipzig_Westseite_2013.jpg/960px-Thomaskirche_Leipzig_Westseite_2013.jpg',
+    imageCaption: 'St. Thomas Church (Thomaskirche), Leipzig — Wikimedia Commons',
+    summary: 'Site of the Leipzig Debate (1519) where Luther was pushed to radicalize his break from Rome.',
+    history: 'Leipzig hosted the Leipzig Debate (1519), where Luther debated theologian Johann Eck. During this debate, Luther was pushed to admit he agreed with some of Jan Hus\'s positions — connecting Prague to Wittenberg historically. This debate radicalized Luther\'s break from Rome. Leipzig was also where J.S. Bach later served as cantor.',
+    sites: [
+      '<span class="site-name">St. Thomas Church</span> — Bach\'s church; Luther preached here in 1539',
+      '<span class="site-name">St. Nicholas Church</span> — Reformation history and 1989 Peaceful Revolution',
+      '<span class="site-name">Old Town Hall</span> — Near the site of the Leipzig Debate'
+    ],
+    tips: [
+      'Good public transport with tram system.',
+      'City center is compact and walkable.'
+    ]
+  },
+  {
+    id: 'erfurt',
+    city: 'Erfurt',
+    country: 'Germany',
+    days: 'Day 4',
+    dates: 'Mar 19',
+    lat: 50.9787, lng: 11.0328,
+    type: 'protestant',
+    currency: 'EUR',
+    reformer: 'Martin Luther',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/2021-09-16_Erfurt_bei_Nacht_1DX_3974_by_Stepro.jpg/960px-2021-09-16_Erfurt_bei_Nacht_1DX_3974_by_Stepro.jpg',
+    imageCaption: 'Erfurt Cathedral — Wikimedia Commons',
+    summary: 'Where Luther\'s spiritual journey began. He became a monk at the Augustinian Monastery in 1505.',
+    history: 'Erfurt is where Luther\'s spiritual journey began. He studied at the University of Erfurt (1501-1505), and after a terrifying thunderstorm, vowed to become a monk. He entered the Augustinian Monastery in 1505, where he underwent intense spiritual struggles (Anfechtungen) about sin, guilt, and God\'s righteousness — the struggles that led to his breakthrough understanding of justification by faith.',
+    sites: [
+      '<span class="site-name">Augustinian Monastery</span> — Where Luther lived as a monk; his cell is preserved. Perhaps the most spiritually moving Luther site',
+      '<span class="site-name">Erfurt Cathedral</span> — Where Luther was ordained as a priest in 1507',
+      '<span class="site-name">St. Severus Church</span> — Adjacent to the cathedral',
+      '<span class="site-name">University of Erfurt</span> — Where Luther studied'
+    ],
+    tips: [
+      'Cathedral and monastery are the must-sees.',
+      'Beautiful medieval old town; Kramerbrücke (Merchants\' Bridge) is worth a quick walk.'
+    ]
+  },
+  {
+    id: 'eisenach',
+    city: 'Eisenach',
+    country: 'Germany',
+    days: 'Day 5',
+    dates: 'Mar 20',
+    lat: 50.9807, lng: 10.3195,
+    type: 'protestant',
+    currency: 'EUR',
+    reformer: 'Martin Luther',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Thuringia_Eisenach_asv2020-07_img23_Wartburg_Castle.jpg/960px-Thuringia_Eisenach_asv2020-07_img23_Wartburg_Castle.jpg',
+    imageCaption: 'Wartburg Castle, Eisenach — Wikimedia Commons',
+    summary: 'Luther hid at Wartburg Castle and translated the New Testament into German in just 11 weeks.',
+    history: 'After the Diet of Worms (1521), Luther was "kidnapped" by allies and hidden at Wartburg Castle for nearly a year. Disguised as "Junker Jörg" (Knight George), Luther translated the New Testament from Greek into German in just 11 weeks — a landmark achievement that standardized the German language and put Scripture into ordinary people\'s hands.',
+    sites: [
+      '<span class="site-name">Wartburg Castle (UNESCO)</span> — Luther\'s room where he translated the Bible is preserved',
+      '<span class="site-name">Luther House Eisenach</span> — Where Luther stayed as a student (1498-1501)',
+      '<span class="site-name">Bach House</span> — Bach was born in Eisenach'
+    ],
+    tips: [
+      'Wartburg Castle requires a steep uphill walk (~20 min) or shuttle.',
+      'Allow 1.5-2 hours for the castle tour.',
+      'Interior rooms may only be accessible by guided tour.'
+    ]
+  },
+  {
+    id: 'frankfurt',
+    city: 'Frankfurt',
+    country: 'Germany',
+    days: 'Day 5',
+    dates: 'Mar 20 (evening)',
+    lat: 50.1109, lng: 8.6821,
+    type: 'transit',
+    currency: 'EUR',
+    reformer: '',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/R%C3%B6merberg_Frankfurt_abends.jpg/960px-R%C3%B6merberg_Frankfurt_abends.jpg',
+    imageCaption: 'Römerberg, Frankfurt — Wikimedia Commons',
+    summary: 'Transit stop. The printing industry here helped spread Reformation ideas across Europe.',
+    history: 'Frankfurt was not a primary Reformation city, but it hosted important Imperial Diets and was a center of the printing industry that spread Reformation ideas. The Frankfurt Book Fair became a channel for distributing Protestant writings across Europe.',
+    sites: [],
+    tips: [
+      'Mostly a transit stop.',
+      'If you have evening free time, Römerberg (old town square) is worth a walk.'
+    ]
+  },
+  {
+    id: 'worms',
+    city: 'Worms',
+    country: 'Germany',
+    days: 'Day 6',
+    dates: 'Mar 21',
+    lat: 49.6341, lng: 8.3507,
+    type: 'protestant',
+    currency: 'EUR',
+    reformer: 'Martin Luther',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Lutherdenkmal_Worms_01.jpg/960px-Lutherdenkmal_Worms_01.jpg',
+    imageCaption: 'Luther Monument, Worms — Wikimedia Commons',
+    summary: '"Here I stand, I can do no other." Luther\'s dramatic stand before Emperor Charles V at the Diet of Worms.',
+    history: 'One of the most dramatic moments in church history. At the Diet of Worms (1521), Luther stood before Emperor Charles V and the assembled princes and refused to recant. His famous declaration: "Here I stand, I can do no other. God help me. Amen." He was declared an outlaw, but this moment cemented the Reformation\'s survival.',
+    sites: [
+      '<span class="site-name">Luther Monument</span> — The largest Reformation monument in the world',
+      '<span class="site-name">Heylshof Garden</span> — Near the site of the Diet',
+      '<span class="site-name">Worms Cathedral</span> — Romanesque cathedral that stood during Luther\'s trial',
+      '<span class="site-name">Trinity Church</span> — Protestant church built after the Reformation'
+    ],
+    tips: [
+      'Small city; main sites can be covered in 2-3 hours.',
+      'The Luther Monument alone is worth the stop.'
+    ]
+  },
+  {
+    id: 'zurich',
+    city: 'Zurich',
+    country: 'Switzerland',
+    days: 'Day 6-7',
+    dates: 'Mar 21-22',
+    lat: 47.3769, lng: 8.5417,
+    type: 'swiss',
+    currency: 'CHF',
+    reformer: 'Huldrych Zwingli',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Grossm%C3%BCnster_Zurich_Switzerland_24Jun2021.jpg/960px-Grossm%C3%BCnster_Zurich_Switzerland_24Jun2021.jpg',
+    imageCaption: 'Grossmünster, Zurich — Wikimedia Commons',
+    summary: 'Center of the Swiss Reformation under Zwingli. Also birthplace of the Anabaptist movement.',
+    history: 'Zurich was the center of the Swiss Reformation under Huldrych Zwingli (1484-1531). Zwingli reformed Zurich independently of Luther, beginning in 1519. He emphasized Scripture\'s authority, removed images from churches, and clashed with Luther over the Lord\'s Supper. Zurich was also where the Anabaptist movement began (1525), led by Conrad Grebel and Felix Manz.',
+    sites: [
+      '<span class="site-name">Grossmünster</span> — Zwingli\'s church; Reformation museum in the cloister',
+      '<span class="site-name">Wasserkirche</span> — Where Felix Manz was drowned for Anabaptist beliefs (1527)',
+      '<span class="site-name">Fraumünster</span> — Notable for Chagall\'s stained glass windows',
+      '<span class="site-name">Zwingli statue</span> — Next to Wasserkirche'
+    ],
+    tips: [
+      'Uses Swiss Franc (CHF) — significantly more expensive than Germany.',
+      'Very walkable along the river/lake.',
+      'Tap water is excellent and free.'
+    ]
+  },
+  {
+    id: 'lucerne',
+    city: 'Lucerne',
+    country: 'Switzerland',
+    days: 'Day 7',
+    dates: 'Mar 22',
+    lat: 47.0502, lng: 8.3093,
+    type: 'catholic',
+    currency: 'CHF',
+    reformer: '',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Luzern_Kapellbruecke.jpg/960px-Luzern_Kapellbruecke.jpg',
+    imageCaption: 'Chapel Bridge (Kapellbrücke), Lucerne — Wikimedia Commons',
+    summary: 'Remained staunchly Catholic. Its Jesuit Church symbolizes the Counter-Reformation.',
+    history: 'Lucerne remained staunchly Catholic during the Reformation and was a leading member of the Catholic cantons opposing Zurich. The religious divide led to the Kappel Wars — the conflict in which Zwingli was killed. Lucerne\'s Jesuit Church (built 1666-1677) was the first large Baroque church in Switzerland, symbolizing the Counter-Reformation.',
+    sites: [
+      '<span class="site-name">Jesuit Church</span> — Counter-Reformation symbol',
+      '<span class="site-name">Chapel Bridge (Kapellbrücke)</span> — Medieval bridge with history paintings',
+      '<span class="site-name">Church of St. Leodegar</span> — Catholic foundation'
+    ],
+    tips: [
+      'Transit city — 1-2 hours is enough.',
+      'Beautiful lakeside setting.'
+    ]
+  },
+  {
+    id: 'geneva',
+    city: 'Geneva',
+    country: 'Switzerland',
+    days: 'Day 7-8',
+    dates: 'Mar 22-23',
+    lat: 46.2044, lng: 6.1432,
+    type: 'swiss',
+    currency: 'CHF',
+    reformer: 'John Calvin',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Reformation_Wall_Geneva_Flip_%28186260559%29.jpeg/960px-Reformation_Wall_Geneva_Flip_%28186260559%29.jpeg',
+    imageCaption: 'Reformation Wall, Geneva — Wikimedia Commons',
+    summary: 'The "Protestant Rome" under John Calvin. His theology shaped Presbyterianism and modern democracy.',
+    history: 'Geneva became the "Protestant Rome" under John Calvin (1509-1564). The French-born theologian arrived in 1536 and transformed Geneva into a model Reformed city. Calvin\'s theology — predestination, God\'s sovereignty, church discipline — profoundly influenced Presbyterianism, the Reformed tradition, Puritanism, and the shaping of modern democracy.',
+    sites: [
+      '<span class="site-name">St. Pierre Cathedral</span> — Calvin\'s church; his chair is preserved',
+      '<span class="site-name">Reformation Wall</span> — Massive monument: Calvin, Beza, Knox, Farel',
+      '<span class="site-name">Calvin Auditorium</span> — Where Calvin lectured',
+      '<span class="site-name">International Museum of the Reformation</span> — Excellent museum',
+      '<span class="site-name">Calvin\'s grave</span> — Plainpalais cemetery, marked only "J.C."'
+    ],
+    tips: [
+      'Uses CHF — expensive city.',
+      'Old Town (Vieille Ville) is compact and walkable.',
+      'Reformation Wall is in Parc des Bastions.'
+    ]
+  },
+  {
+    id: 'milan',
+    city: 'Milan',
+    country: 'Italy',
+    days: 'Day 8-9',
+    dates: 'Mar 23-24',
+    lat: 45.4642, lng: 9.1900,
+    type: 'catholic',
+    currency: 'EUR',
+    reformer: 'Carlo Borromeo',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg/960px-Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg',
+    imageCaption: 'The Last Supper by Leonardo da Vinci, Cenacolo Vinciano — Wikimedia Commons',
+    summary: 'Counter-Reformation stronghold. Visit Cenacolo Vinciano (The Last Supper) on 3/24 at 9:30 AM.',
+    history: 'Home of St. Ambrose and later Carlo Borromeo, the Counter-Reformation archbishop who implemented the reforms of the Council of Trent most rigorously. Milan represents the Catholic response to Protestantism. The city is also home to Leonardo da Vinci\'s masterpiece The Last Supper (1495-1498), housed in the refectory of Santa Maria delle Grazie.',
+    sites: [
+      '<span class="site-name">Cenacolo Vinciano</span> — Leonardo da Vinci\'s The Last Supper. <strong>Booked: 3/24 at 9:30 AM</strong>',
+      '<span class="site-name">Santa Maria delle Grazie</span> — UNESCO World Heritage church housing The Last Supper',
+      '<span class="site-name">Milan Cathedral (Duomo)</span> — Gothic masterpiece, Counter-Reformation symbol'
+    ],
+    tips: [
+      'Italy uses Euro.',
+      'Cenacolo Vinciano visit is strictly timed — arrive 15 min early. Only 15 min viewing allowed.',
+      'The Last Supper is at Piazza di Santa Maria delle Grazie, 2 — about 20 min walk from Duomo.',
+      'After the visit, head to Florence.'
+    ]
+  },
+  {
+    id: 'florence',
+    city: 'Florence',
+    country: 'Italy',
+    days: 'Day 9',
+    dates: 'Mar 24 (afternoon)',
+    lat: 43.7696, lng: 11.2558,
+    type: 'catholic',
+    currency: 'EUR',
+    reformer: 'Savonarola',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Palazzo_vecchio_Florence.jpg/960px-Palazzo_vecchio_Florence.jpg',
+    imageCaption: 'Piazza della Signoria, Florence — Wikimedia Commons',
+    summary: 'Savonarola preached against Church corruption decades before Luther. Burned at the stake in 1498.',
+    history: 'Girolamo Savonarola (1452-1498) was a Dominican friar who preached against corruption in the church and secular society decades before Luther. He briefly ruled Florence as a theocracy before being excommunicated and burned at the stake. Luther admired Savonarola as a proto-reformer.',
+    sites: [
+      '<span class="site-name">San Marco Monastery</span> — Where Savonarola lived; his cell is preserved',
+      '<span class="site-name">Piazza della Signoria</span> — Where Savonarola was executed (plaque marks the spot)'
+    ],
+    tips: [
+      'If you have time, San Marco and the execution plaque are close together.'
+    ]
+  },
+  {
+    id: 'rome',
+    city: 'Rome',
+    country: 'Italy',
+    days: 'Day 10-12',
+    dates: 'Mar 25-27',
+    lat: 41.9028, lng: 12.4964,
+    type: 'catholic',
+    currency: 'EUR',
+    reformer: '',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IT2_11_12_St_Peters_Basilica_Rome_small.jpg/960px-IT2_11_12_St_Peters_Basilica_Rome_small.jpg',
+    imageCaption: 'St. Peter\'s Basilica, Rome — Wikimedia Commons',
+    summary: 'Where the corruption Luther protested was centered. The indulgences funding St. Peter\'s triggered the 95 Theses.',
+    history: 'Rome is where the corruption Luther protested was centered. The sale of indulgences to fund St. Peter\'s Basilica was the direct trigger for the 95 Theses. Pope Leo X excommunicated Luther in 1521. Luther visited Rome in 1510 as a young monk and was shocked by the corruption he witnessed — planting seeds of his later protest.',
+    sites: [
+      '<span class="site-name">St. Peter\'s Basilica</span> — Its construction financing sparked the Reformation',
+      '<span class="site-name">Vatican Museums / Sistine Chapel</span> — The wealth reformers criticized',
+      '<span class="site-name">Scala Santa (Holy Stairs)</span> — Luther climbed these in 1510 seeking merit, then realized "the just shall live by faith"',
+      '<span class="site-name">Castel Sant\'Angelo</span> — Papal fortress',
+      '<span class="site-name">San Paolo fuori le Mura</span> — Where Paul was traditionally martyred'
+    ],
+    tips: [
+      'Book Vatican tickets in advance — lines can be 3+ hours.',
+      'Scala Santa is near St. John Lateran, not at the Vatican.',
+      'Dress code: covered shoulders and knees.',
+      'March weather: ~8-16°C, pleasant for walking.',
+      'Roma Pass can save money on transport and museums.'
+    ]
+  },
+  {
+    id: 'pompeii',
+    city: 'Pompeii / Sorrento / Naples',
+    country: 'Italy',
+    days: 'Day 11',
+    dates: 'Mar 26 (day trip)',
+    lat: 40.7462, lng: 14.4989,
+    type: 'transit',
+    currency: 'EUR',
+    reformer: '',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Pompeii%2C_Italy_102.jpg/960px-Pompeii%2C_Italy_102.jpg',
+    imageCaption: 'Ruins of Pompeii — Wikimedia Commons',
+    summary: 'Day trip from Rome — sightseeing, not reformation-related.',
+    history: 'A day trip from Rome primarily for sightseeing. Not directly related to the Reformation story.',
+    sites: [],
+    tips: [
+      'Pompeii requires 2-3 hours minimum; wear comfortable shoes.',
+      'Watch for pickpockets in Naples.',
+      'Beautiful Amalfi coast views near Sorrento.'
+    ]
+  }
+];
+
+// Initialize map
+const map = L.map('map', {
+  zoomControl: true,
+  scrollWheelZoom: true
+}).setView([48.5, 11.0], 5);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
+// Draw route line
+const routeCoords = stops.map(s => [s.lat, s.lng]);
+L.polyline(routeCoords, {
+  color: '#e94560',
+  weight: 2,
+  opacity: 0.5,
+  dashArray: '8, 8'
+}).addTo(map);
+
+// Animated route
+L.polyline(routeCoords, {
+  color: '#e94560',
+  weight: 3,
+  opacity: 0.8
+}).addTo(map);
+
+// Color map for marker types
+const markerColors = {
+  protestant: '#e94560',
+  swiss: '#6fcf97',
+  catholic: '#f0c060',
+  transit: '#7a7aaa'
+};
+
+// Add markers
+const markers = {};
+stops.forEach((stop, i) => {
+  const color = markerColors[stop.type];
+  const icon = L.divIcon({
+    className: 'custom-marker',
+    html: `<div class="marker-pin ${stop.type}"><span class="marker-day">${i+1}</span></div>`,
+    iconSize: [28, 36],
+    iconAnchor: [14, 36],
+    popupAnchor: [0, -36]
+  });
+
+  const marker = L.marker([stop.lat, stop.lng], { icon }).addTo(map);
+
+  const popupContent = `
+    <h3>${stop.city}</h3>
+    <div class="popup-date">${stop.days} &middot; ${stop.dates}</div>
+    <div class="popup-desc">${stop.summary}</div>
+    <div class="popup-link" onclick="showDetail('${stop.id}')">View details &rarr;</div>
+  `;
+  marker.bindPopup(popupContent, { maxWidth: 280 });
+  markers[stop.id] = marker;
+});
+
+// Sidebar is built by rebuildSidebar() below
+
+// Korean translations
+const ko = {
+  prague: {
+    summary: '루터 이전에 종교개혁이 시작된 곳. 얀 후스는 95개조 논제보다 한 세기 전에 교회에 도전했습니다.',
+    history: '프라하는 루터 이전에 종교개혁이 시작된 곳입니다. 얀 후스(1369-1415)는 체코의 사제이자 카를 대학교 총장으로, 가톨릭 교회의 부패, 특히 면죄부 판매에 도전했습니다. 그는 콘스탄츠 공의회(1415)에서 이단자로 화형당했습니다. 그의 추종자인 후스파는 유럽을 뒤흔든 전쟁을 일으켰고, 루터 운동의 토대를 놓았습니다.',
+    sites: [
+      '<span class="site-name">베들레헴 예배당</span> — 후스가 라틴어가 아닌 체코어로 설교한 곳',
+      '<span class="site-name">구시가 광장</span> — 얀 후스 기념 동상이 중앙에 있음',
+      '<span class="site-name">카를 대학교 (카롤리눔)</span> — 후스가 총장을 역임한 곳',
+      '<span class="site-name">틴 교회</span> — 후스파 교회; 성배 상징 주목'
+    ],
+    tips: [
+      '유로가 아닌 체코 코루나(CZK) 사용. 카드 결제 가능.',
+      '트램/지하철 72시간 패스 구매 추천.',
+      '3월 날씨: ~2-10°C, 레이어드 필수.',
+      '구시가지는 도보 이동 가능; 대부분의 유적지가 가까움.'
+    ]
+  },
+  wittenberg: {
+    summary: '개신교 종교개혁의 발상지. 루터가 1517년 성 교회 문에 95개조 논제를 게시했습니다.',
+    history: '개신교 종교개혁의 발상지입니다. 1517년 10월 31일, 마르틴 루터는 면죄부 판매에 항의하며 성 교회 문에 95개조 논제를 게시했습니다. 비텐베르크는 루터가 살고, 가르치며, 오직 은혜와 오직 믿음(sola gratia, sola fide)에 의한 구원 신학을 발전시킨 곳입니다.',
+    sites: [
+      '<span class="site-name">성 교회 (슐로스키르헤)</span> — 유명한 95개조 논제의 문; 루터의 무덤이 내부에 있음',
+      '<span class="site-name">성모 교회</span> — "종교개혁의 어머니 교회"',
+      '<span class="site-name">루터 하우스</span> — 세계 최대의 종교개혁 박물관',
+      '<span class="site-name">멜란히톤 하우스</span> — 루터의 가장 가까운 협력자의 집',
+      '<span class="site-name">루터 참나무</span> — 루터가 교황 칙서를 불태운 곳 (1520)'
+    ],
+    tips: [
+      '작은 마을 — 모든 유적지 도보 거리.',
+      '이동 중이므로 시간 제한; 성 교회 + 루터하우스 우선.',
+      '독일은 유로 사용.'
+    ]
+  },
+  leipzig: {
+    summary: '라이프치히 논쟁(1519)이 열린 곳. 루터가 로마와의 결별을 급진화한 계기가 됨.',
+    history: '라이프치히는 루터가 신학자 요한 에크와 논쟁한 라이프치히 논쟁(1519)을 주최했습니다. 이 논쟁에서 루터는 얀 후스의 일부 입장에 동의함을 인정하게 되었고, 이는 프라하와 비텐베르크를 역사적으로 연결했습니다. 바흐가 나중에 성가대 지휘자로 봉사한 곳이기도 합니다.',
+    sites: [
+      '<span class="site-name">성 토마스 교회</span> — 바흐의 교회; 루터가 1539년 여기서 설교',
+      '<span class="site-name">성 니콜라스 교회</span> — 종교개혁 역사와 1989년 평화 혁명',
+      '<span class="site-name">구 시청사</span> — 라이프치히 논쟁 장소 근처'
+    ],
+    tips: [
+      '트램 시스템으로 좋은 대중교통.',
+      '도심은 작고 도보 이동 가능.'
+    ]
+  },
+  erfurt: {
+    summary: '루터의 영적 여정이 시작된 곳. 1505년 아우구스티누스 수도원에서 수도사가 됨.',
+    history: '에르푸르트는 루터의 영적 여정이 시작된 곳입니다. 에르푸르트 대학에서 공부(1501-1505)한 후, 무서운 뇌우를 겪고 수도사가 되겠다고 서원했습니다. 1505년 아우구스티누스 수도원에 입회하여 죄, 죄책감, 하나님의 의에 대한 격렬한 영적 투쟁을 겪었고, 이것이 이신칭의에 대한 돌파적 이해로 이어졌습니다.',
+    sites: [
+      '<span class="site-name">아우구스티누스 수도원</span> — 루터가 수도사로 살았던 곳; 그의 방이 보존됨. 가장 영적으로 감동적인 루터 유적지',
+      '<span class="site-name">에르푸르트 대성당</span> — 루터가 1507년 사제로 서품된 곳',
+      '<span class="site-name">성 세베루스 교회</span> — 대성당에 인접',
+      '<span class="site-name">에르푸르트 대학교</span> — 루터가 공부한 곳'
+    ],
+    tips: [
+      '대성당과 수도원이 필수 방문지.',
+      '아름다운 중세 구시가지; 크레머브뤼케(상인의 다리) 추천.'
+    ]
+  },
+  eisenach: {
+    summary: '루터가 바르트부르크 성에 숨어 11주 만에 신약성경을 독일어로 번역함.',
+    history: '보름스 제국의회(1521) 이후, 루터는 동맹자들에 의해 "납치"되어 바르트부르크 성에 약 1년간 숨었습니다. "융커 외르크"(기사 게오르크)로 변장한 루터는 단 11주 만에 신약성경을 그리스어에서 독일어로 번역했습니다 — 독일어를 표준화하고 일반인에게 성경을 전달한 획기적 업적입니다.',
+    sites: [
+      '<span class="site-name">바르트부르크 성 (유네스코)</span> — 루터가 성경을 번역한 방이 보존됨',
+      '<span class="site-name">루터 하우스 아이제나흐</span> — 루터가 학생 시절 머문 곳 (1498-1501)',
+      '<span class="site-name">바흐 하우스</span> — 바흐의 출생지'
+    ],
+    tips: [
+      '바르트부르크 성까지 가파른 오르막 도보 (~20분) 또는 셔틀.',
+      '성 투어에 1.5-2시간 소요.',
+      '내부 객실은 가이드 투어로만 접근 가능할 수 있음.'
+    ]
+  },
+  frankfurt: {
+    summary: '경유지. 이곳의 인쇄 산업이 종교개혁 사상을 유럽 전역에 전파하는 데 기여.',
+    history: '프랑크푸르트는 주요 종교개혁 도시는 아니었지만, 중요한 제국의회를 개최했고 종교개혁 사상을 전파한 인쇄 산업의 중심지였습니다. 프랑크푸르트 도서전은 유럽 전역에 개신교 저술을 배포하는 통로가 되었습니다.',
+    sites: [],
+    tips: [
+      '주로 경유지.',
+      '저녁 자유시간이 있으면 뢰머베르크(구시가 광장) 산책 추천.'
+    ]
+  },
+  worms: {
+    summary: '"내가 여기 서 있나니, 달리 할 수 없나이다." 보름스 제국의회에서 루터의 극적인 신앙 고백.',
+    history: '교회 역사상 가장 극적인 순간 중 하나입니다. 보름스 제국의회(1521)에서 루터는 황제 카를 5세와 모인 제후들 앞에 서서 자신의 글을 철회하기를 거부했습니다. 그의 유명한 선언: "내가 여기 서 있나니, 달리 할 수 없나이다. 하나님이여 도우소서. 아멘." 그는 무법자로 선언되었지만, 이 순간이 종교개혁의 생존을 확고히 했습니다.',
+    sites: [
+      '<span class="site-name">루터 기념비</span> — 세계 최대의 종교개혁 기념비',
+      '<span class="site-name">하일스호프 정원</span> — 제국의회 장소 근처',
+      '<span class="site-name">보름스 대성당</span> — 루터의 재판 당시 있었던 로마네스크 양식 대성당',
+      '<span class="site-name">삼위일체 교회</span> — 종교개혁 이후 건축된 개신교 교회'
+    ],
+    tips: [
+      '작은 도시; 주요 유적지 2-3시간이면 충분.',
+      '루터 기념비만으로도 방문할 가치가 있음.'
+    ]
+  },
+  zurich: {
+    summary: '츠빙글리 하의 스위스 종교개혁 중심지. 재세례파 운동의 발상지이기도 함.',
+    history: '취리히는 울리히 츠빙글리(1484-1531) 하의 스위스 종교개혁 중심지였습니다. 츠빙글리는 1519년부터 루터와 독립적으로 취리히를 개혁했습니다. 성경의 권위를 강조하고 교회에서 이미지를 제거했으며, 성만찬에 대해 루터와 충돌했습니다. 취리히는 또한 콘라드 그레벨과 펠릭스 만츠가 이끈 재세례파 운동이 시작된 곳(1525)이기도 합니다.',
+    sites: [
+      '<span class="site-name">그로스뮌스터</span> — 츠빙글리의 교회; 수도원에 종교개혁 박물관',
+      '<span class="site-name">바서키르헤</span> — 펠릭스 만츠가 재세례파 신앙으로 익사형을 당한 곳 (1527)',
+      '<span class="site-name">프라우뮌스터</span> — 샤갈의 스테인드글라스로 유명',
+      '<span class="site-name">츠빙글리 동상</span> — 바서키르헤 옆'
+    ],
+    tips: [
+      '스위스 프랑(CHF) 사용 — 독일보다 훨씬 비쌈.',
+      '강/호수를 따라 도보 이동에 매우 좋음.',
+      '수돗물은 우수하고 무료.'
+    ]
+  },
+  lucerne: {
+    summary: '확고한 가톨릭 도시. 예수회 교회는 반종교개혁의 상징.',
+    history: '루체른은 종교개혁 기간 동안 확고한 가톨릭 도시로 남았으며 취리히와 개신교 주에 반대하는 가톨릭 주의 주요 구성원이었습니다. 종교적 분열은 카펠 전쟁으로 이어졌고, 이 전쟁에서 츠빙글리가 전사했습니다. 루체른의 예수회 교회(1666-1677 건축)는 스위스 최초의 대형 바로크 교회로 반종교개혁을 상징합니다.',
+    sites: [
+      '<span class="site-name">예수회 교회</span> — 반종교개혁의 상징',
+      '<span class="site-name">카펠교 (카펠브뤼케)</span> — 도시 역사를 그린 그림이 있는 중세 다리',
+      '<span class="site-name">성 레오데가르 교회</span> — 가톨릭 교회'
+    ],
+    tips: [
+      '경유 도시 — 1-2시간이면 충분.',
+      '아름다운 호수가 풍경.'
+    ]
+  },
+  geneva: {
+    summary: '존 칼뱅 하의 "개신교의 로마". 그의 신학은 장로교와 현대 민주주의에 영향.',
+    history: '제네바는 존 칼뱅(1509-1564) 하에서 "개신교의 로마"가 되었습니다. 프랑스 태생의 신학자는 1536년 도착하여 제네바를 모범적인 개혁 도시로 변모시켰습니다. 칼뱅의 신학 — 예정론, 하나님의 주권, 교회 규율 — 은 장로교, 개혁 전통, 청교도주의, 그리고 현대 민주주의 형성에 깊은 영향을 미쳤습니다.',
+    sites: [
+      '<span class="site-name">생 피에르 대성당</span> — 칼뱅의 교회; 그의 의자가 보존됨',
+      '<span class="site-name">종교개혁 기념벽</span> — 거대한 기념비: 칼뱅, 베자, 녹스, 파렐',
+      '<span class="site-name">칼뱅 강당</span> — 칼뱅이 강의한 곳',
+      '<span class="site-name">국제 종교개혁 박물관</span> — 훌륭한 박물관',
+      '<span class="site-name">칼뱅의 무덤</span> — 플랭팔레 묘지, "J.C."로만 표시'
+    ],
+    tips: [
+      'CHF 사용 — 물가가 비싼 도시.',
+      '구시가지 (비에이유 빌)는 작고 도보 이동 가능.',
+      '종교개혁 기념벽은 바스티옹 공원에 있음.'
+    ]
+  },
+  milan: {
+    summary: '반종교개혁의 거점. 3/24 오전 9:30에 체나콜로 빈치아노 (최후의 만찬) 방문.',
+    history: '성 암브로시우스의 고향이자 나중에 반종교개혁 대주교 카를로 보로메오가 트렌트 공의회의 개혁을 가장 엄격하게 시행한 곳입니다. 밀라노는 개신교에 대한 가톨릭의 대응을 대표합니다. 이 도시에는 산타 마리아 델레 그라치에 수도원 식당에 소장된 레오나르도 다 빈치의 걸작 최후의 만찬(1495-1498)이 있습니다.',
+    sites: [
+      '<span class="site-name">체나콜로 빈치아노</span> — 레오나르도 다 빈치의 최후의 만찬. <strong>예약: 3/24 오전 9:30</strong>',
+      '<span class="site-name">산타 마리아 델레 그라치에</span> — 최후의 만찬이 있는 유네스코 세계유산 교회',
+      '<span class="site-name">밀라노 대성당 (두오모)</span> — 고딕 걸작, 반종교개혁의 상징'
+    ],
+    tips: [
+      '이탈리아는 유로 사용.',
+      '체나콜로 빈치아노 방문은 시간이 엄격히 정해져 있음 — 15분 전 도착. 관람 시간 15분.',
+      '최후의 만찬은 산타 마리아 델레 그라치에 광장 2번지 — 두오모에서 도보 약 20분.',
+      '방문 후 피렌체로 이동.'
+    ]
+  },
+  florence: {
+    summary: '사보나롤라가 루터보다 수십 년 전에 교회 부패를 비판. 1498년 화형.',
+    history: '지롤라모 사보나롤라(1452-1498)는 루터보다 수십 년 전에 교회와 세속 사회의 부패를 비판한 도미니크회 수도사였습니다. 그는 잠시 피렌체를 신정 정치로 통치했다가 파문당하고 화형에 처해졌습니다. 루터는 사보나롤라를 원시 개혁자로 존경했습니다.',
+    sites: [
+      '<span class="site-name">산 마르코 수도원</span> — 사보나롤라가 살았던 곳; 그의 방이 보존됨',
+      '<span class="site-name">시뇨리아 광장</span> — 사보나롤라가 처형된 곳 (표지판이 위치를 표시)'
+    ],
+    tips: [
+      '시간이 있으면 산 마르코와 처형 표지판은 가까움.'
+    ]
+  },
+  rome: {
+    summary: '루터가 항의한 부패의 중심지. 성 베드로 대성당 건축을 위한 면죄부가 95개조 논제의 직접적 계기.',
+    history: '로마는 루터가 항의한 부패의 중심지였습니다. 성 베드로 대성당 건축 자금을 위한 면죄부 판매가 95개조 논제의 직접적 계기였습니다. 교황 레오 10세는 1521년 루터를 파문했습니다. 루터는 1510년 젊은 수도사로 로마를 방문했고 목격한 부패에 충격을 받았습니다 — 이것이 후일 항의의 씨앗이 되었습니다.',
+    sites: [
+      '<span class="site-name">성 베드로 대성당</span> — 그 건축 자금이 종교개혁을 촉발',
+      '<span class="site-name">바티칸 박물관 / 시스티나 예배당</span> — 개혁자들이 비판한 부와 예술 후원',
+      '<span class="site-name">스칼라 산타 (거룩한 계단)</span> — 루터가 1510년 무릎으로 올라가다 "의인은 믿음으로 산다"를 깨달음',
+      '<span class="site-name">산탄젤로 성</span> — 교황의 요새',
+      '<span class="site-name">산 파올로 푸오리 레 무라</span> — 바울이 전통적으로 순교한 곳'
+    ],
+    tips: [
+      '바티칸 티켓 사전 예약 필수 — 예약 없이 3시간 이상 대기.',
+      '스칼라 산타는 바티칸이 아닌 산 조반니 인 라테라노 근처.',
+      '복장 규정: 어깨와 무릎 가리기.',
+      '3월 날씨: ~8-16°C, 도보에 쾌적.',
+      '로마 패스로 교통비와 박물관 할인 가능.'
+    ]
+  },
+  pompeii: {
+    summary: '로마에서 당일치기 여행 — 관광, 종교개혁과 무관.',
+    history: '주로 관광 목적의 로마 당일치기 여행입니다. 종교개혁 이야기와 직접적인 관련은 없습니다.',
+    sites: [],
+    tips: [
+      '폼페이 최소 2-3시간 필요; 편한 신발 착용.',
+      '나폴리에서 소매치기 주의.',
+      '소렌토 근처 아말피 해안의 아름다운 경치.'
+    ]
+  }
+};
+
+// Weather data for each stop (typical March weather)
+const weather = {
+  prague:     { temp: '2-10°C', desc: 'Cool, partly cloudy', icon: '🌥️', ko: '서늘, 부분적으로 흐림' },
+  wittenberg: { temp: '2-9°C',  desc: 'Cool, chance of rain', icon: '🌧️', ko: '서늘, 비 가능성' },
+  leipzig:    { temp: '3-10°C', desc: 'Cool, partly cloudy', icon: '🌥️', ko: '서늘, 부분적으로 흐림' },
+  erfurt:     { temp: '2-9°C',  desc: 'Cool, overcast', icon: '☁️', ko: '서늘, 흐림' },
+  eisenach:   { temp: '1-8°C',  desc: 'Cool, possible showers', icon: '🌧️', ko: '서늘, 소나기 가능' },
+  frankfurt:  { temp: '4-12°C', desc: 'Mild, partly sunny', icon: '⛅', ko: '온화, 부분적으로 맑음' },
+  worms:      { temp: '4-13°C', desc: 'Mild, partly sunny', icon: '⛅', ko: '온화, 부분적으로 맑음' },
+  zurich:     { temp: '2-10°C', desc: 'Cool, variable', icon: '🌤️', ko: '서늘, 변화무쌍' },
+  lucerne:    { temp: '2-10°C', desc: 'Cool, scenic', icon: '🌤️', ko: '서늘, 경치 좋음' },
+  geneva:     { temp: '3-11°C', desc: 'Cool, chance of rain', icon: '🌧️', ko: '서늘, 비 가능성' },
+  milan:      { temp: '6-14°C', desc: 'Mild, partly cloudy', icon: '⛅', ko: '온화, 부분적으로 흐림' },
+  florence:   { temp: '6-15°C', desc: 'Mild, mostly sunny', icon: '🌤️', ko: '온화, 대체로 맑음' },
+  rome:       { temp: '8-16°C', desc: 'Warm, sunny', icon: '☀️', ko: '따뜻, 맑음' },
+  pompeii:    { temp: '8-16°C', desc: 'Warm, sunny', icon: '☀️', ko: '따뜻, 맑음' }
+};
+
+const uiText = {
+  en: { history: 'Reformation History', sites: 'Key Sites', tips: 'Practical Tips', weather: 'Expected Weather', details: 'View details' },
+  ko: { history: '종교개혁 역사', sites: '주요 유적지', tips: '실용 팁', weather: '예상 날씨', details: '상세 보기' }
+};
+
+let currentLang = 'en';
+let currentDetailId = null;
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+  document.querySelector('header h1').textContent = lang === 'en'
+    ? 'European Reformation Pilgrimage'
+    : '유럽 종교개혁 순례';
+  document.querySelector('header .subtitle').innerHTML = lang === 'en'
+    ? 'March 16 - 27, 2026 &middot; 12 Days &middot; 6 Countries'
+    : '2026년 3월 16-27일 &middot; 12일 &middot; 6개국';
+  rebuildSidebar();
+  if (currentDetailId) showDetail(currentDetailId);
+}
+
+function getField(stop, field) {
+  if (currentLang === 'ko' && ko[stop.id] && ko[stop.id][field] !== undefined) {
+    return ko[stop.id][field];
+  }
+  return stop[field];
+}
+
+function rebuildSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  stops.forEach(stop => {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.id = `card-${stop.id}`;
+    if (stop.id === currentDetailId) card.classList.add('active');
+
+    const tags = [];
+    if (stop.reformer) tags.push(`<span class="tag reformer">${stop.reformer}</span>`);
+    if (stop.currency) tags.push(`<span class="tag currency">${stop.currency}</span>`);
+    const sitesList = getField(stop, 'sites');
+    if (sitesList.length > 0) tags.push(`<span class="tag site">${sitesList.length} ${currentLang === 'ko' ? '유적지' : 'sites'}</span>`);
+
+    const w = weather[stop.id];
+    const weatherHtml = w ? `<div class="weather-badge">${w.icon} ${w.temp} ${currentLang === 'ko' ? w.ko : w.desc}</div>` : '';
+
+    card.innerHTML = `
+      <div class="type-bar" style="background:${markerColors[stop.type]}"></div>
+      <div class="day-header">
+        <span class="day-badge ${stop.type}">${stop.days}</span>
+        <span class="day-city">${stop.city}</span>
+        <span class="day-date">${stop.dates}</span>
+      </div>
+      <div class="day-summary">${getField(stop, 'summary')}</div>
+      ${weatherHtml}
+      <div class="day-tags">${tags.join('')}</div>
+    `;
+
+    card.addEventListener('click', () => {
+      showDetail(stop.id);
+      map.flyTo([stop.lat, stop.lng], 10, { duration: 1.2 });
+      markers[stop.id].openPopup();
+    });
+
+    sb.appendChild(card);
+  });
+}
+
+function showDetail(id) {
+  const stop = stops.find(s => s.id === id);
+  if (!stop) return;
+  currentDetailId = id;
+
+  // Update active card
+  document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById(`card-${id}`);
+  if (card) {
+    card.classList.add('active');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  const panel = document.getElementById('detail-panel');
+  const ui = uiText[currentLang];
+  const sitesList = getField(stop, 'sites');
+  const tipsList = getField(stop, 'tips');
+
+  const sitesHtml = sitesList.length > 0
+    ? `<div class="detail-section"><h3>${ui.sites}</h3><ul>${sitesList.map(s => `<li>${s}</li>`).join('')}</ul></div>`
+    : '';
+
+  const tipsHtml = tipsList.length > 0
+    ? `<div class="detail-section"><h3>${ui.tips}</h3><div class="tip-box"><p>${tipsList.join('<br>')}</p></div></div>`
+    : '';
+
+  const imageHtml = stop.image
+    ? `<img class="detail-image" src="${stop.image}" alt="${stop.city}" loading="lazy"><div class="detail-image-caption">${stop.imageCaption || ''}</div>`
+    : '';
+
+  const w = weather[stop.id];
+  const weatherHtml = w
+    ? `<div class="detail-weather"><span class="weather-icon">${w.icon}</span> <strong>${w.temp}</strong> &mdash; ${currentLang === 'ko' ? w.ko : w.desc}</div>`
+    : '';
+
+  panel.innerHTML = `
+    <div class="detail-header">
+      <button class="detail-close" onclick="document.getElementById('detail-panel').style.display='none'; currentDetailId=null;">&times;</button>
+      <h2>${stop.city}, ${stop.country}</h2>
+      <div class="detail-date">${stop.days} &middot; ${stop.dates}</div>
+    </div>
+    <div class="detail-body">
+      ${imageHtml}
+      ${weatherHtml}
+      <div class="detail-section">
+        <h3>${ui.history}</h3>
+        <p>${getField(stop, 'history')}</p>
+      </div>
+      ${sitesHtml}
+      ${tipsHtml}
+    </div>
+  `;
+
+  panel.style.display = 'block';
+}
+
+// Mobile tab switching
+function switchTab(tab) {
+  const sidebarEl = document.getElementById('sidebar');
+  const mapEl = document.getElementById('map');
+  const tabList = document.getElementById('tab-list');
+  const tabMap = document.getElementById('tab-map');
+
+  if (tab === 'list') {
+    sidebarEl.classList.remove('hidden');
+    mapEl.classList.remove('visible');
+    tabList.classList.add('active');
+    tabMap.classList.remove('active');
+  } else {
+    sidebarEl.classList.add('hidden');
+    mapEl.classList.add('visible');
+    tabList.classList.remove('active');
+    tabMap.classList.add('active');
+    // Leaflet needs invalidateSize after becoming visible
+    setTimeout(() => map.invalidateSize(), 100);
+  }
+}
+
+// Update tab labels on language switch
+const origSetLang = setLang;
+setLang = function(lang) {
+  origSetLang(lang);
+  const tabList = document.getElementById('tab-list');
+  const tabMap = document.getElementById('tab-map');
+  if (tabList) tabList.textContent = lang === 'ko' ? '일정' : 'Itinerary';
+  if (tabMap) tabMap.textContent = lang === 'ko' ? '지도' : 'Map';
+};
+
+// When clicking a sidebar card on mobile, switch to map
+const origShowDetail = showDetail;
+showDetail = function(id) {
+  origShowDetail(id);
+  if (window.innerWidth <= 768) {
+    // Don't auto-switch to map on mobile — keep the detail panel fullscreen overlay
+  }
+};
+
+// Initial sidebar build
+rebuildSidebar();
+
+// Fit map to all markers
+map.fitBounds(routeCoords, { padding: [40, 40] });
+</script>
+
+</body>
+</html>
